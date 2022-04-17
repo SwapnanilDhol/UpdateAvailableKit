@@ -11,82 +11,35 @@
 
 import Foundation
 
-enum UpdateAvailableKitError: Error {
-    case appStoreVersionMissing(for: ITunesLookupResult?)
-}
-
-extension UpdateAvailableKitError: CustomStringConvertible {
-    var description: String {
-        switch self {
-#warning("Add relevant error description")
-            case .appStoreVersionMissing(let result):
-                return "App Store version missing for \(String(describing: result))"
-        }
-    }
-}
-
 public final class UpdateAvailableManager {
 
     public static let shared = UpdateAvailableManager()
-    private let cacheKey = "UpdateAvailableManager.ITunesCachedData"
+    let cacheKey = "UpdateAvailableManager.ITunesCachedData"
     private init() { }
 
-    // MARK: - Version Update
-    @available(iOS 15.0, macOS 12.0, tvOS 15.0, watchOS 8.0, *)
-    public func checkForVersionUpdate(
+    // MARK: - Completion Handler Based Methods
+
+    private func queryITunesForNewResponse(
         with bundleID: String = Bundle.main.bundleIdentifier,
-        currentVersion: String = Bundle.main.releaseVersionNumber,
-        useCache: Bool = true) async throws -> UpdateAvailableResult {
-            guard let url: URL = .createITunesLookupURL(with: bundleID) else {
-                throw URLError(.badURL)
-            }
-
-            if useCache {
-                if let cachedData = UserDefaults.standard.data(forKey: cacheKey) {
-                    let response = try JSONDecoder().decode(LookupCachableResponse.self, from: cachedData)
-
-                    if let currentAppStoreVersion = response.response.results?.first?.version,
-                       Date() < response.expiryDate {
-                        if self.isAppStoreVersionGreaterThanCurrentVersion(
-                            appStoreVersion: currentAppStoreVersion,
-                            currentVersion: currentVersion
-                        ) {
-                            return .updateAvailable(newVersion: currentAppStoreVersion)
-                        } else {
-                            return .noUpdatesAvailable
-                        }
-                    } else {
-                        return .noUpdatesAvailable
-                    }
-                } else {
-                    return .noUpdatesAvailable
-                }
-            } else {
-                let (data, _) = try await URLSession.shared.data(from: url)
-                let response = try JSONDecoder().decode(ITunesLookupResponse.self, from: data)
-
-                guard let currentAppStoreVersion = response.results?.first?.version else {
-                    throw UpdateAvailableKitError.appStoreVersionMissing(for: response.results?.first)
-                }
-
-                let cachableReponse: LookupCachableResponse = .init(
-                    expiryDate: Date().addingTimeInterval(3600),
-                    response: response
-                )
-
-                let cachedResponseData = try JSONEncoder().encode(cachableReponse)
-                UserDefaults.standard.set(cachedResponseData, forKey: self.cacheKey)
-
-                if isAppStoreVersionGreaterThanCurrentVersion(
-                    appStoreVersion: currentAppStoreVersion,
-                    currentVersion: currentVersion
-                ) {
-                    return .updateAvailable(newVersion: currentAppStoreVersion)
-                } else {
-                    return .noUpdatesAvailable
-                }
-            }
+        completion: @escaping((Result<ITunesLookupResponse, Error>) -> Void)
+    ) {
+        guard let url: URL = .createITunesLookupURL(with: bundleID) else {
+            completion(.failure(URLError(.badURL)))
+            return
         }
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data else { return }
+            guard let response = try? JSONDecoder().decode(ITunesLookupResponse.self, from: data) else { return }
+            let cachableReponse: LookupCachableResponse = .init(
+                expiryDate: Date().addingTimeInterval(3600),
+                response: response
+            )
+            guard let cachedResponseData = try? JSONEncoder().encode(cachableReponse) else { return }
+            UserDefaults.standard.set(cachedResponseData, forKey: self.cacheKey)
+            completion(.success(response))
+        }
+        .resume()
+    }
 
     public func checkForVersionUpdate(
         with bundleID: String = Bundle.main.bundleIdentifier,
@@ -94,51 +47,41 @@ public final class UpdateAvailableManager {
         useCache: Bool = true,
         completion: @escaping((Result<UpdateAvailableResult, Error>) -> Void)
     ) {
-        guard let url: URL = .createITunesLookupURL(with: bundleID) else { return }
         if useCache {
             if let cachedData = UserDefaults.standard.data(forKey: cacheKey),
                let response = try? JSONDecoder().decode(LookupCachableResponse.self, from: cachedData),
                let currentAppStoreVersion = response.response.results?.first?.version,
                Date() < response.expiryDate {
-                if self.isAppStoreVersionGreaterThanCurrentVersion(
+                let successResult = self.isAppStoreVersionGreaterThanCurrentVersion(
                     appStoreVersion: currentAppStoreVersion,
                     currentVersion: currentVersion
-                ) {
-                    completion(.success(.updateAvailable(newVersion: currentAppStoreVersion)))
-                } else {
-                    completion(.success(.noUpdatesAvailable))
-                }
+                )
+                completion(.success(successResult))
                 return
             }
         }
-        URLSession.shared.dataTask(with: url) { data, _, _ in
-            guard let data = data else { return }
-            guard let response = try? JSONDecoder().decode(ITunesLookupResponse.self, from: data) else { return }
-            guard let currentAppStoreVersion = response.results?.first?.version else { return }
-            if self.isAppStoreVersionGreaterThanCurrentVersion(
-                appStoreVersion: currentAppStoreVersion,
-                currentVersion: currentVersion
-            ) {
-                completion(.success(.updateAvailable(newVersion: currentAppStoreVersion)))
-            } else {
-                completion(.success(.noUpdatesAvailable))
+        queryITunesForNewResponse { result in
+            switch result {
+            case .success(let response):
+                if let currentAppStoreVersion = response.results?.first?.version {
+                    let successResult = self.isAppStoreVersionGreaterThanCurrentVersion(
+                        appStoreVersion: currentAppStoreVersion,
+                        currentVersion: currentVersion
+                    )
+                    completion(.success(successResult))
+                }
+            case .failure:
+                break
             }
-            let cachableReponse: LookupCachableResponse = .init(
-                expiryDate: Date().addingTimeInterval(3600),
-                response: response
-            )
-            guard let cachedResponseData = try? JSONEncoder().encode(cachableReponse) else { return }
-            UserDefaults.standard.set(cachedResponseData, forKey: self.cacheKey)
         }
-        .resume()
     }
 
     // MARK: - Utility Methods
 
-    private func isAppStoreVersionGreaterThanCurrentVersion(
+    public func isAppStoreVersionGreaterThanCurrentVersion(
         appStoreVersion: String,
         currentVersion: String
-    ) -> Bool {
+    ) -> UpdateAvailableResult {
         let currentVersionComponents = currentVersion.components(separatedBy: ".")
         let appStoreVersionComponents = appStoreVersion.components(separatedBy: ".")
         var index = 0
@@ -146,12 +89,12 @@ public final class UpdateAvailableManager {
             let appStoreComponent = Int(appStoreVersionComponents[index]) ?? 0
             let currentVersionComponent = Int(currentVersionComponents[index]) ?? 0
             if appStoreComponent > currentVersionComponent {
-                return true
+                return .updateAvailable(newVersion: appStoreVersion)
             } else if appStoreComponent < currentVersionComponent {
-                return false
+                return .noUpdatesAvailable
             }
             index += 1
         }
-        return false
+        return .noUpdatesAvailable
     }
 }

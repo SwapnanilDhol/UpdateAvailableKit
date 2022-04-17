@@ -11,7 +11,7 @@
 
 import Foundation
 
-public enum UpdateAvailableResult {
+public enum UpdateAvailableResult: Equatable {
     case updateAvailable(newVersion: String)
     case noUpdatesAvailable
 }
