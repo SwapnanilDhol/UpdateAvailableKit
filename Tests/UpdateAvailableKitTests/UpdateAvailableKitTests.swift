@@ -3,26 +3,55 @@ import XCTest
 
 final class UpdateAvailableKitTests: XCTestCase {
 
-    let bundleIdentifier = "com.swapnanildhol.subscriptiontracker"
-    let currentVersion = "2.3.4"
+    private let bundleIdentifier = "com.swapnanildhol.subscriptiontracker"
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        // XCTAssertEqual(UpdateAvailableKit().text, "Hello, World!")
-        // create the expectation
-//        let exp = expectation(description: "Loading stories")
-//        UpdateAvailableManager.shared.checkForVersionUpdate { result in
-//            switch result {
-//            case .success:
-//                exp.fulfill()
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
-//        waitForExpectations(timeout: 10) { erro in
-//            print(erro)
-//        }
+    func testNoUpdateAvailable() throws {
+        let currentVersion = "2.3.4"
+        let expectation = expectation(description: "Checking Version")
+        UpdateAvailableManager.shared.checkForVersionUpdate(
+            with: bundleIdentifier,
+            currentVersion: currentVersion,
+            useCache: false
+        ) { result in
+            switch result {
+            case .success(let result):
+                switch result {
+                case .noUpdatesAvailable:
+                    expectation.fulfill()
+                default:
+                    break
+                }
+            case .failure:
+                break
+            }
+        }
+        waitForExpectations(timeout: 10) { error in
+            print("Expectation Failed with \(String(describing: error))")
+        }
+    }
+
+    func testUpdateAvailable() throws {
+        let currentVersion = "2.3.3"
+        let expectation = expectation(description: "Checking Version")
+        UpdateAvailableManager.shared.checkForVersionUpdate(
+            with: bundleIdentifier,
+            currentVersion: currentVersion,
+            useCache: false
+        ) { result in
+            switch result {
+            case .success(let result):
+                switch result {
+                case .updateAvailable:
+                    expectation.fulfill()
+                default:
+                    break
+                }
+            case .failure:
+                break
+            }
+        }
+        waitForExpectations(timeout: 10) { error in
+            print("Expectation Failed with \(String(describing: error))")
+        }
     }
 }

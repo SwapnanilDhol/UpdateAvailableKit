@@ -11,7 +11,7 @@
 
 import Foundation
 
-extension Bundle {
+public extension Bundle {
     var releaseVersionNumber: String {
         guard let shortVersionString = infoDictionary?["CFBundleShortVersionString"] as? String else { return " " }
         return shortVersionString
