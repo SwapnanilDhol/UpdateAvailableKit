@@ -42,21 +42,24 @@ public final class UpdateAvailableManager {
             }
 
             if useCache {
-                if let cachedData = UserDefaults.standard.data(forKey: cacheKey),
-                   let response = try? JSONDecoder().decode(LookupCachableResponse.self, from: cachedData),
-                   let currentAppStoreVersion = response.response.results?.first?.version,
-                   Date() < response.expiryDate {
-                    if self.isAppStoreVersionGreaterThanCurrentVersion(
-                        appStoreVersion: currentAppStoreVersion,
-                        currentVersion: currentVersion
-                    ) {
-                        return .updateAvailable(newVersion: currentAppStoreVersion)
+                if let cachedData = UserDefaults.standard.data(forKey: cacheKey) {
+                    let response = try JSONDecoder().decode(LookupCachableResponse.self, from: cachedData)
+
+                    if let currentAppStoreVersion = response.response.results?.first?.version,
+                       Date() < response.expiryDate {
+                        if self.isAppStoreVersionGreaterThanCurrentVersion(
+                            appStoreVersion: currentAppStoreVersion,
+                            currentVersion: currentVersion
+                        ) {
+                            return .updateAvailable(newVersion: currentAppStoreVersion)
+                        } else {
+                            return .noUpdatesAvailable
+                        }
                     } else {
                         return .noUpdatesAvailable
                     }
                 } else {
-#warning("Throw relevant error")
-                    throw URLError(.badServerResponse)
+                    return .noUpdatesAvailable
                 }
             } else {
                 let (data, _) = try await URLSession.shared.data(from: url)
