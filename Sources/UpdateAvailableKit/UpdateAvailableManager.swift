@@ -5,6 +5,7 @@
  * Copyright (c) 2022 Swapnanil Dhol. All rights reserved.
  *
  * Authors: Swapnanil Dhol <swapnanildhol # gmail.com>
+ * Rudrank Riyam <rudrankriyam # gmail.com>
  *
  * Refer to the COPYING file of the official project for license.
  *****************************************************************************/
