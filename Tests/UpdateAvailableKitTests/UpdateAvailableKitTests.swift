@@ -19,7 +19,7 @@ final class UpdateAvailableKitTests: XCTestCase {
                 case .noUpdatesAvailable:
                     expectation.fulfill()
                 default:
-                    expectation.fulfill()
+                    break
                 }
             case .failure:
                 break

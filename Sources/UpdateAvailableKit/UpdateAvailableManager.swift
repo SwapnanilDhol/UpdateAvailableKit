@@ -61,7 +61,7 @@ public final class UpdateAvailableManager {
                 return
             }
         }
-        queryITunesForNewResponse { result in
+        queryITunesForNewResponse(with: bundleID) { result in
             switch result {
             case .success(let response):
                 if let currentAppStoreVersion = response.results?.first?.version {
