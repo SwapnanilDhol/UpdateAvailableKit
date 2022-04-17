@@ -2,6 +2,10 @@ import XCTest
 @testable import UpdateAvailableKit
 
 final class UpdateAvailableKitTests: XCTestCase {
+
+    let bundleIdentifier = "com.swapnanildhol.subscriptiontracker"
+    let currentVersion = "2.3.4"
+
     func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
