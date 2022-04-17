@@ -9,5 +9,5 @@ import Foundation
 
 public enum UpdateAvailableResult {
     case updateAvailable(newVersion: String)
-    case noUpdatedAvailable
+    case noUpdatesAvailable
 }

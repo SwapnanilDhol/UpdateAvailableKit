@@ -28,7 +28,7 @@ public final class UpdateAvailableManager {
                 if self.isAppStoreVersionGreaterThanCurrentVersion(appStoreVersion: currentAppStoreVersion) {
                     completion(.success(.updateAvailable(newVersion: currentAppStoreVersion)))
                 } else {
-                    completion(.success(.noUpdatedAvailable))
+                    completion(.success(.noUpdatesAvailable))
                 }
                 return
             }
@@ -40,7 +40,7 @@ public final class UpdateAvailableManager {
             if self.isAppStoreVersionGreaterThanCurrentVersion(appStoreVersion: currentAppStoreVersion) {
                 completion(.success(.updateAvailable(newVersion: currentAppStoreVersion)))
             } else {
-                completion(.success(.noUpdatedAvailable))
+                completion(.success(.noUpdatesAvailable))
             }
             let cachableReponse: LookupCachableResponse = .init(
                 expiryDate: Date().addingTimeInterval(3600),
