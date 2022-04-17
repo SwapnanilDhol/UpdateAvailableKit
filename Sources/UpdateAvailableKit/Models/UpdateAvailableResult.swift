@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum UpdateAvailableResult {
+public enum UpdateAvailableResult {
     case updateAvailable(newVersion: String)
     case noUpdatedAvailable
 }

@@ -7,9 +7,9 @@
 
 import Foundation
 
-final class UpdateAvailableManager {
+public final class UpdateAvailableManager {
 
-    static let shared = UpdateAvailableManager()
+    public static let shared = UpdateAvailableManager()
     private let cacheKey = "UpdateAvailableManager.ITunesCachedData"
     private init() { }
 
