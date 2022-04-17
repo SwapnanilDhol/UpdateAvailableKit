@@ -1,13 +1,17 @@
-//
-//  File.swift
-//  
-//
-//  Created by Swapnanil Dhol on 17/04/22.
-//
+/*****************************************************************************
+ * UpdateAvailableResult.swift
+ * UpdateAvailableKit
+ *****************************************************************************
+ * Copyright (c) 2022 Swapnanil Dhol. All rights reserved.
+ *
+ * Authors: Swapnanil Dhol <swapnanildhol # gmail.com>
+ *
+ * Refer to the COPYING file of the official project for license.
+ *****************************************************************************/
 
 import Foundation
 
-public enum UpdateAvailableResult {
+public enum UpdateAvailableResult: Equatable {
     case updateAvailable(newVersion: String)
-    case noUpdatedAvailable
+    case noUpdatesAvailable
 }

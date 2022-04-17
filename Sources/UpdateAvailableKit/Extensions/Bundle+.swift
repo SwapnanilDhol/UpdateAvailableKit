@@ -1,13 +1,17 @@
-//
-//  File.swift
-//  
-//
-//  Created by Swapnanil Dhol on 17/04/22.
-//
+/*****************************************************************************
+ * Bundle+.swift
+ * UpdateAvailableKit
+ *****************************************************************************
+ * Copyright (c) 2022 Swapnanil Dhol. All rights reserved.
+ *
+ * Authors: Swapnanil Dhol <swapnanildhol # gmail.com>
+ *
+ * Refer to the COPYING file of the official project for license.
+ *****************************************************************************/
 
 import Foundation
 
-extension Bundle {
+public extension Bundle {
     var releaseVersionNumber: String {
         guard let shortVersionString = infoDictionary?["CFBundleShortVersionString"] as? String else { return " " }
         return shortVersionString
