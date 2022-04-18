@@ -2,7 +2,7 @@
 This is UpdateAvailableKit: a super easy way to check if the installed app has an update available. It is built with simplicity and customisability in mind and comes with pre-written tests.
 
 ## Installation 
-`UpdateAvailableKit` is available via [Swift Package Manager](https://swift.org/package-manager/). To add `UpdateAvailableKit ` simply add this repo’s URL to your project’s package file. You can choose to use one of the stable releases (tagged) or you can point your package file to the main branch of this project. Although, I would not merge broken code into `main`, if you prefer stability, it’s recommended to use a tagged version.
+`UpdateAvailableKit` is available via [Swift Package Manager](https://swift.org/package-manager/). To add `UpdateAvailableKit` simply add this repo’s URL to your project’s package file. You can choose to use one of the stable releases (tagged) or you can point your package file to the main branch of this project. Although, I would not merge broken code into the `main` branch, if you prefer stability, it’s recommended to use a tagged version.
 
 ```
 https://github.com/SwapnanilDhol/UpdateAvailableKit
@@ -20,7 +20,7 @@ public func checkForVersionUpdate(
 )
 ```
 
-`checkForVersionUpdate` is self describing. It checks the current version that’s installed on device and compares it to the version that’s live on the AppStore. It returns a Swift Result where Success is `UpdateAvailableResult` and failure is a generic `Error` for now.
+`checkForVersionUpdate` is self describing. It checks the current version that’s installed on the device and compares it to the version that’s live on the AppStore. It returns a Swift Result where Success is `UpdateAvailableResult` and failure is a generic `Error` for now.
 
 The function accepts a few parameters. Most of them have a default value attached to them but can be overridden when necessary.
 * `bundleID`: Pass a Bundle Identifier here. It defaults to your target’s `Bundle.main.bundleIdentifer` value.
@@ -82,8 +82,8 @@ case .failure(let error):
 ```
 
 ## Caching
-To fetch the current AppStore version, `UpdateAvailableKit` performs a GET request to the ITunesLookup end point. The URL for the same is:
-`https://itunes.apple.com/lookup?bundleID=yourBundleID`
+To fetch the current AppStore version, `UpdateAvailableKit` performs a GET request to the ITunesLookup end point. The URL is
+`https://itunes.apple.com/lookup?bundleID=yourBundleID`.\
 The response is then cached for 3600 seconds so as to not make repeated calls to the API and to trigger the completion super fast.🚀 The response is encoded and stored in `UserDefaults`. No external cache solution is used. In the future, I’d like to move it to a solution based on SwiftCache.
 
 ## Like the framework?
@@ -98,4 +98,4 @@ Contributions are always welcome. Please follow the following convention if you�
 * For issue fixes: #IssueNumber NameOfFile: ChangesMade
 
 ## License
-This project is licensed under the MIT License - see the  [LICENSE](https://github.com/SwapnanilDhol/IGStoryKit/blob/main/LICENSE.md)  file for details
+This project is licensed under the MIT License - see the  [LICENSE](https://github.com/SwapnanilDhol/UpdateAvailableKit/blob/main/LICENSE.md)  file for details
