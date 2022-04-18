@@ -61,6 +61,6 @@ extension UpdateAvailableManager {
                 currentVersion: currentVersion
             )
         }
-        fatalError("Have to Handle this edge case.")
+        throw URLError(.badURL)
     }
 }
