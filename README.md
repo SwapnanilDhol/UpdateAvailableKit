@@ -63,21 +63,11 @@ This case will be returned when the current installed version is equal to or gre
 If you’re using iOS 15 and above, you can choose to use the `async` `await` alternative. Thanks to [Rudrank Riyam](https://github.com/rudrankriyam) for this contribution.
 
 ```swift
-let result = try await UpdateAvailableManager.shared.checkForVersionUpdate(
-    with: bundleIdentifier,
-    currentVersion: currentVersion,
-    useCache: false
-)
-switch result {
-case .success(let result):
-    switch result {
-    case .updateAvailable(let newVersion):
-        print("Update Available. New Verison is \(newVersion)")
-    case .noUpdatesAvailable:
-        print("No updates available")
-    }
-case .failure(let error):
-    print("Error did Occur. Error was \(error)")
+switch try await UpdateAvailableManager.shared.checkForVersionUpdate() {
+case .updateAvailable(let newVersion):
+    print("New Version is available. \(newVersion)")
+case .noUpdatesAvailable:
+    print("No updates available")
 }
 ```
 
