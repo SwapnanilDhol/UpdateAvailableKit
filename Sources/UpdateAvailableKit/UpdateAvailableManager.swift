@@ -83,18 +83,17 @@ public final class UpdateAvailableManager {
         appStoreVersion: String,
         currentVersion: String
     ) -> UpdateAvailableResult {
-        let currentVersionComponents = currentVersion.components(separatedBy: ".")
-        let appStoreVersionComponents = appStoreVersion.components(separatedBy: ".")
-        var index = 0
-        while index < appStoreVersionComponents.count {
-            let appStoreComponent = Int(appStoreVersionComponents[index]) ?? 0
-            let currentVersionComponent = Int(currentVersionComponents[index]) ?? 0
-            if appStoreComponent > currentVersionComponent {
+        let appStoreComponents = appStoreVersion.split(separator: ".").compactMap { Int($0) }
+        let currentComponents = currentVersion.split(separator: ".").compactMap { Int($0) }
+        let maxCount = max(appStoreComponents.count, currentComponents.count)
+        for i in 0..<maxCount {
+            let appStoreValue = i < appStoreComponents.count ? appStoreComponents[i] : 0
+            let currentValue = i < currentComponents.count ? currentComponents[i] : 0
+            if appStoreValue > currentValue {
                 return .updateAvailable(newVersion: appStoreVersion)
-            } else if appStoreComponent < currentVersionComponent {
+            } else if appStoreValue < currentValue {
                 return .noUpdatesAvailable
             }
-            index += 1
         }
         return .noUpdatesAvailable
     }
