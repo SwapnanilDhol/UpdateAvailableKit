@@ -1,0 +1,123 @@
+#if canImport(SwiftUI) && canImport(UIKit)
+import SwiftUI
+import UIKit
+
+public struct UpdateAvailableBannerView: View {
+    private let newVersion: String?
+    private let theme: UpdateAvailableBannerTheme
+    private let appStoreID: String?
+    private let onTap: (() -> Void)?
+
+    public init(
+        result: UpdateAvailableResult,
+        theme: UpdateAvailableBannerTheme = .default,
+        appStoreID: String? = nil,
+        onTap: (() -> Void)? = nil
+    ) {
+        switch result {
+        case .updateAvailable(let newVersion):
+            self.newVersion = newVersion
+        case .noUpdatesAvailable:
+            self.newVersion = nil
+        }
+        self.theme = theme
+        self.appStoreID = appStoreID
+        self.onTap = onTap
+    }
+
+    public init(
+        newVersion: String?,
+        theme: UpdateAvailableBannerTheme = .default,
+        appStoreID: String? = nil,
+        onTap: (() -> Void)? = nil
+    ) {
+        self.newVersion = newVersion
+        self.theme = theme
+        self.appStoreID = appStoreID
+        self.onTap = onTap
+    }
+
+    public var body: some View {
+        if let version = newVersion {
+            VStack(spacing: 0) {
+                Button {
+                    openAppStore()
+                    onTap?()
+                } label: {
+                    HStack(spacing: 12) {
+                        Image(systemName: theme.iconName)
+                            .font(.title2)
+                            .foregroundStyle(theme.titleColor)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Update Available")
+                                .font(.headline)
+                                .foregroundStyle(theme.titleColor)
+
+                            Text("Version \(version) is now available")
+                                .font(.caption)
+                                .foregroundStyle(theme.subtitleColor)
+                        }
+
+                        Spacer(minLength: 8)
+
+                        Text(theme.buttonTitle)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(theme.buttonTitleColor)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(theme.buttonColor, in: Capsule())
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+
+                Divider()
+            }
+            .background(theme.backgroundColor)
+            .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
+
+    private func openAppStore() {
+        let id = appStoreID ?? Bundle.main.bundleIdentifier ?? ""
+        guard let url = URL(string: "https://apps.apple.com/app/id\(id)") else {
+            return
+        }
+        UIApplication.shared.open(url)
+    }
+}
+
+#if DEBUG
+#Preview("Update Available") {
+    VStack {
+        Spacer()
+        UpdateAvailableBannerView(
+            newVersion: "2.1.0",
+            appStoreID: "123456789"
+        )
+    }
+    .preferredColorScheme(.dark)
+}
+
+#Preview("Custom Theme") {
+    VStack {
+        Spacer()
+        UpdateAvailableBannerView(
+            newVersion: "3.0.0",
+            theme: UpdateAvailableBannerTheme(
+                backgroundColor: .orange.opacity(0.15),
+                titleColor: .orange,
+                iconName: "star.fill",
+                buttonTitle: "Get Update",
+                buttonColor: .orange
+            ),
+            appStoreID: "123456789"
+        )
+    }
+    .preferredColorScheme(.dark)
+}
+#endif
+#endif
