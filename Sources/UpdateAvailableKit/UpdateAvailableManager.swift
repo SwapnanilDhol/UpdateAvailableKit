@@ -22,6 +22,7 @@ public struct UpdateAvailableConfiguration {
     }
 }
 
+@MainActor
 public final class UpdateAvailableManager: ObservableObject {
 
     public static let shared = UpdateAvailableManager()
@@ -40,7 +41,6 @@ public final class UpdateAvailableManager: ObservableObject {
     }
 
     /// Starts checking for app updates. Call once at app launch.
-    @MainActor
     public func start() {
         let bundleID = configuration.bundleID ?? Bundle.main.bundleIdentifier ?? ""
         Task {
@@ -77,7 +77,7 @@ public final class UpdateAvailableManager: ObservableObject {
 
     private static let cacheKey = "UpdateAvailableManager.ITunesCachedData"
 
-    static func compare(appStoreVersion: String, currentVersion: String) -> UpdateAvailableResult {
+    nonisolated static func compare(appStoreVersion: String, currentVersion: String) -> UpdateAvailableResult {
         let appStoreComponents = appStoreVersion.split(separator: ".").compactMap { Int($0) }
         let currentComponents = currentVersion.split(separator: ".").compactMap { Int($0) }
         let maxCount = max(appStoreComponents.count, currentComponents.count)
