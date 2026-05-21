@@ -7,12 +7,14 @@ public struct UpdateAvailableBannerView: View {
     private let theme: UpdateAvailableBannerTheme
     private let appStoreID: String?
     private let onTap: (() -> Void)?
+    private let onDismiss: (() -> Void)?
 
     public init(
         result: UpdateAvailableResult,
         theme: UpdateAvailableBannerTheme = .default,
         appStoreID: String? = nil,
-        onTap: (() -> Void)? = nil
+        onTap: (() -> Void)? = nil,
+        onDismiss: (() -> Void)? = nil
     ) {
         switch result {
         case .updateAvailable(let newVersion):
@@ -23,18 +25,21 @@ public struct UpdateAvailableBannerView: View {
         self.theme = theme
         self.appStoreID = appStoreID
         self.onTap = onTap
+        self.onDismiss = onDismiss
     }
 
     public init(
         newVersion: String?,
         theme: UpdateAvailableBannerTheme = .default,
         appStoreID: String? = nil,
-        onTap: (() -> Void)? = nil
+        onTap: (() -> Void)? = nil,
+        onDismiss: (() -> Void)? = nil
     ) {
         self.newVersion = newVersion
         self.theme = theme
         self.appStoreID = appStoreID
         self.onTap = onTap
+        self.onDismiss = onDismiss
     }
 
     public var body: some View {
@@ -67,6 +72,16 @@ public struct UpdateAvailableBannerView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(theme.buttonColor, in: Capsule())
+
+                        if onDismiss != nil {
+                            Button {
+                                onDismiss?()
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(theme.subtitleColor)
+                            }
+                        }
                     }
                     .contentShape(Rectangle())
                 }

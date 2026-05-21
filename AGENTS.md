@@ -44,6 +44,19 @@ UpdateAvailableBannerView(
     appStoreID: "123456789" // numeric App Store ID
 )
 
+// Or use the View modifier with dismiss support
+@State private var updateVersion: String? = nil
+// set updateVersion when manager.result is .updateAvailable(...)
+
+YourView()
+    .updateAvailableBanner(
+        version: $updateVersion,
+        appStoreID: "123456789",
+        theme: .default,
+        onTap: { /* analytics */ },
+        onDismiss: { /* analytics */ }
+    )
+
 // Custom banner theme
 UpdateAvailableBannerTheme(
     backgroundColor: .orange.opacity(0.15),
@@ -81,8 +94,9 @@ Sources/UpdateAvailableKit/
 │   ├── ITunesLookupResult.swift        # iTunes API result entry model
 │   └── LookupCachableResponse.swift    # Cache wrapper (response + expiry)
 └── UI/
-    ├── UpdateAvailableBannerView.swift # SwiftUI banner (UIKit-aware)
-    └── UpdateAvailableBannerTheme.swift # Configurable theme
+    ├── UpdateAvailableBannerView.swift         # SwiftUI banner (standalone)
+    ├── UpdateAvailableBannerTheme.swift         # Configurable theme
+    └── View+UpdateAvailableBanner.swift         # View modifier with dismiss
 ```
 
 ### Key Design Patterns
