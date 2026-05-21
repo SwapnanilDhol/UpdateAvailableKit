@@ -43,6 +43,7 @@ public final class UpdateAvailableManager: ObservableObject {
     /// Starts checking for app updates. Call once at app launch.
     public func start() {
         let bundleID = configuration.bundleID ?? Bundle.main.bundleIdentifier ?? ""
+        guard !bundleID.isEmpty else { return }
         Task {
             let result = await self.checkForVersionUpdate(
                 with: bundleID,

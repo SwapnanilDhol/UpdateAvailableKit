@@ -81,6 +81,7 @@ public struct UpdateAvailableBannerView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(theme.subtitleColor)
                             }
+                            .accessibilityLabel("Dismiss")
  
                         }
                     }
