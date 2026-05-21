@@ -8,19 +8,27 @@ public extension View {
         appStoreID: String,
         theme: UpdateAvailableBannerTheme = .default,
         onTap: (() -> Void)? = nil,
-        onDismiss: (() -> Void)? = nil
+        onDismiss: (() -> Void)? = nil,
+        ignoresSafeArea: Bool = false
     ) -> some View {
-        self.safeAreaInset(edge: .top, spacing: 0) {
-            UpdateAvailableBannerView(
-                newVersion: version.wrappedValue,
-                theme: theme,
-                appStoreID: appStoreID,
-                onTap: onTap,
-                onDismiss: {
-                    version.wrappedValue = nil
-                    onDismiss?()
-                }
-            )
+        let banner = UpdateAvailableBannerView(
+            newVersion: version.wrappedValue,
+            theme: theme,
+            appStoreID: appStoreID,
+            onTap: onTap,
+            onDismiss: {
+                version.wrappedValue = nil
+                onDismiss?()
+            }
+        )
+        if ignoresSafeArea {
+            self.overlay(alignment: .top) {
+                banner
+            }
+        } else {
+            self.safeAreaInset(edge: .top, spacing: 0) {
+                banner
+            }
         }
         .animation(.easeInOut, value: version.wrappedValue)
     }

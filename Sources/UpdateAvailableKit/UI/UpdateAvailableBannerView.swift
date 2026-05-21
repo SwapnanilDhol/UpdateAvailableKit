@@ -72,7 +72,6 @@ public struct UpdateAvailableBannerView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(theme.buttonColor, in: Capsule())
-                            .modifier(GlassEffectFallbackModifier())
 
                         if onDismiss != nil {
                             Button {
@@ -93,7 +92,7 @@ public struct UpdateAvailableBannerView: View {
 
                 Divider()
             }
-            .modifier(GlassBannerBackgroundModifier(fallbackColor: theme.backgroundColor))
+            .background(theme.backgroundColor)
             .transition(.move(edge: .top).combined(with: .opacity))
         }
     }
@@ -104,31 +103,6 @@ public struct UpdateAvailableBannerView: View {
             return
         }
         UIApplication.shared.open(url)
-    }
-}
-
-private struct GlassBannerBackgroundModifier: ViewModifier {
-    let fallbackColor: Color
-
-    func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content
-                .glassEffect()
-        } else {
-            content
-                .background(fallbackColor)
-        }
-    }
-}
-
-private struct GlassEffectFallbackModifier: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 26, *) {
-            content
-                .glassEffect()
-        } else {
-            content
-        }
     }
 }
 
