@@ -72,6 +72,7 @@ public struct UpdateAvailableBannerView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
                             .background(theme.buttonColor, in: Capsule())
+                            .modifier(GlassEffectFallbackModifier())
 
                         if onDismiss != nil {
                             Button {
@@ -81,6 +82,7 @@ public struct UpdateAvailableBannerView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(theme.subtitleColor)
                             }
+ 
                         }
                     }
                     .contentShape(Rectangle())
@@ -91,7 +93,7 @@ public struct UpdateAvailableBannerView: View {
 
                 Divider()
             }
-            .background(theme.backgroundColor)
+            .modifier(GlassBannerBackgroundModifier(fallbackColor: theme.backgroundColor))
             .transition(.move(edge: .top).combined(with: .opacity))
         }
     }
@@ -105,10 +107,35 @@ public struct UpdateAvailableBannerView: View {
     }
 }
 
+private struct GlassBannerBackgroundModifier: ViewModifier {
+    let fallbackColor: Color
+
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content
+                .glassEffect()
+        } else {
+            content
+                .background(fallbackColor)
+        }
+    }
+}
+
+private struct GlassEffectFallbackModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content
+                .glassEffect()
+        } else {
+            content
+        }
+    }
+}
+
 #if DEBUG
+@available(iOS 17, *)
 #Preview("Update Available") {
     VStack {
-        Spacer()
         UpdateAvailableBannerView(
             newVersion: "2.1.0",
             appStoreID: "123456789"
@@ -117,6 +144,7 @@ public struct UpdateAvailableBannerView: View {
     .preferredColorScheme(.dark)
 }
 
+@available(iOS 17, *)
 #Preview("Custom Theme") {
     VStack {
         Spacer()

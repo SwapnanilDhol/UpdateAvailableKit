@@ -27,6 +27,7 @@ public extension View {
 }
 
 #if DEBUG
+@available(iOS 17, *)
 #Preview {
     @Previewable @State var version: String? = "2.1.0"
 
@@ -35,6 +36,7 @@ public extension View {
             Text("Content")
         }
         .navigationTitle("App")
+        .navigationBarTitleDisplayMode(.inline)
         .updateAvailableBanner(
             version: $version,
             appStoreID: "123456789"
