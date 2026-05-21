@@ -10,6 +10,50 @@ UpdateAvailableKit is a lightweight SPM library that checks whether an installed
 - **Dependencies:** None (zero external deps)
 - **Test Framework:** Swift Testing (`@Test` / `#expect`)
 
+## Quick Start
+
+```swift
+// Package.swift
+.package(url: "https://github.com/SwapnanilDhol/UpdateAvailableKit", from: "2.0.0")
+
+// App entry point
+import UpdateAvailableKit
+UpdateAvailableManager.shared.start()
+```
+
+## Public API
+
+```swift
+// Configure before start (optional — defaults: bundleID = nil, cacheDuration = 3600s)
+UpdateAvailableManager.shared.configure(with: .init(
+    bundleID: "com.example.app",
+    cacheDuration: 7200
+))
+
+// Observe result in SwiftUI
+@ObservedObject private var manager = UpdateAvailableManager.shared
+
+switch manager.result {
+case .updateAvailable(let newVersion): // new version on App Store
+case .noUpdatesAvailable:              // up to date or error
+}
+
+// Show built-in banner (requires SwiftUI + UIKit)
+UpdateAvailableBannerView(
+    result: manager.result,
+    appStoreID: "123456789" // numeric App Store ID
+)
+
+// Custom banner theme
+UpdateAvailableBannerTheme(
+    backgroundColor: .orange.opacity(0.15),
+    titleColor: .orange,
+    iconName: "star.fill",
+    buttonTitle: "Get Update",
+    buttonColor: .orange
+)
+```
+
 ## Build & Test Commands
 
 ```bash
