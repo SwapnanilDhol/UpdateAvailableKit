@@ -6,7 +6,7 @@
  *
  * Authors: Swapnanil Dhol <swapnanildhol # gmail.com>
  *
- * Refer to the COPYING file of the official project for license.
+ * Refer to the LICENSE.md file of the official project for license.
  *****************************************************************************/
 
 import Foundation
@@ -44,7 +44,10 @@ public final class UpdateAvailableManager: ObservableObject {
     public func start() {
         let bundleID = configuration.bundleID ?? Bundle.main.bundleIdentifier ?? ""
         Task {
-            let result = await self.checkForVersionUpdate(with: bundleID)
+            let result = await self.checkForVersionUpdate(
+                with: bundleID,
+                currentVersion: Bundle.main.releaseVersionNumber
+            )
             self.result = result
         }
     }
@@ -74,28 +77,6 @@ public final class UpdateAvailableManager: ObservableObject {
 
     private static let cacheKey = "UpdateAvailableManager.ITunesCachedData"
 
-    private func checkForVersionUpdate(with bundleID: String) async -> UpdateAvailableResult {
-        if let cached = cachedVersionResult() {
-            return cached
-        }
-        do {
-            let response = try await fetchFromITunes(with: bundleID)
-            if let version = response.results?.first?.version {
-                let result = UpdateAvailableManager.compare(appStoreVersion: version)
-                cacheResponse(response)
-                return result
-            }
-            return .noUpdatesAvailable
-        } catch {
-            return .noUpdatesAvailable
-        }
-    }
-
-    private static func compare(appStoreVersion: String) -> UpdateAvailableResult {
-        let current = Bundle.main.releaseVersionNumber
-        return compare(appStoreVersion: appStoreVersion, currentVersion: current)
-    }
-
     static func compare(appStoreVersion: String, currentVersion: String) -> UpdateAvailableResult {
         let appStoreComponents = appStoreVersion.split(separator: ".").compactMap { Int($0) }
         let currentComponents = currentVersion.split(separator: ".").compactMap { Int($0) }
@@ -110,10 +91,6 @@ public final class UpdateAvailableManager: ObservableObject {
             }
         }
         return .noUpdatesAvailable
-    }
-
-    private func cachedVersionResult() -> UpdateAvailableResult? {
-        cachedVersionResult(currentVersion: Bundle.main.releaseVersionNumber)
     }
 
     private func cachedVersionResult(currentVersion: String) -> UpdateAvailableResult? {
@@ -151,10 +128,7 @@ public final class UpdateAvailableManager: ObservableObject {
 
 private extension Bundle {
     var releaseVersionNumber: String {
-        infoDictionary?["CFBundleShortVersionString"] as? String ?? " "
-    }
-    var buildVersionNumber: String {
-        infoDictionary?["CFBundleVersion"] as? String ?? " "
+        infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
     }
 }
 
