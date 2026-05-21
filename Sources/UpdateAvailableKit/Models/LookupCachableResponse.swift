@@ -6,7 +6,7 @@
  *
  * Authors: Swapnanil Dhol <swapnanildhol # gmail.com>
  *
- * Refer to the COPYING file of the official project for license.
+ * Refer to the LICENSE.md file of the official project for license.
  *****************************************************************************/
 import Foundation
 
