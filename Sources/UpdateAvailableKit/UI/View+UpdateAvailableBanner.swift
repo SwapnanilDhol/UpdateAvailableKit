@@ -22,15 +22,14 @@ public extension View {
             }
         )
         if ignoresSafeArea {
-            self.overlay(alignment: .top) {
-                banner
-            }
+            self
+                .overlay(alignment: .top) { banner }
+                .animation(.easeInOut, value: version.wrappedValue)
         } else {
-            self.safeAreaInset(edge: .top, spacing: 0) {
-                banner
-            }
+            self
+                .safeAreaInset(edge: .top, spacing: 0) { banner }
+                .animation(.easeInOut, value: version.wrappedValue)
         }
-        .animation(.easeInOut, value: version.wrappedValue)
     }
 }
 
